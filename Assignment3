@@ -1,0 +1,135 @@
+
+package assignment_1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Order {
+    String type; // "BUY" or "SELL"
+    int quantity;
+    double price;
+
+    public Order(String type, int quantity, double price) {
+        this.type = type;
+        this.quantity = quantity;
+        this.price = price;
+    }
+}
+
+class OrderBook {
+    List<Order> buyOrders;
+    List<Order> sellOrders;
+
+    public OrderBook() {
+        buyOrders = new ArrayList<>();
+        sellOrders = new ArrayList<>();
+    }
+
+    public void placeOrder(Order order) {
+        if (order.type.equals("BUY")) {
+            buyOrders.add(order);
+        } else if (order.type.equals("SELL")) {
+            sellOrders.add(order);
+        }
+    }
+
+    public void cancelOrder(Order order) {
+        if (order.type.equals("BUY")) {
+            buyOrders.remove(order);
+        } else if (order.type.equals("SELL")) {
+            sellOrders.remove(order);
+        }
+    }
+
+    public void matchOrders() {
+        for (int i = 0; i < buyOrders.size(); i++) {
+            for (int j = 0; j < sellOrders.size(); j++) {
+                Order buyOrder = buyOrders.get(i);
+                Order sellOrder = sellOrders.get(j);
+
+                if (buyOrder.price >= sellOrder.price) {
+                    int matchedQuantity = Math.min(buyOrder.quantity, sellOrder.quantity);
+                    buyOrder.quantity -= matchedQuantity;
+                    sellOrder.quantity -= matchedQuantity;
+
+                    System.out.println("Transaction: Buyer bought " + matchedQuantity + " units at " + sellOrder.price + " INR each.");
+
+                    if (buyOrder.quantity == 0) {
+                        buyOrders.remove(i);
+                        i--;
+                    }
+
+                    if (sellOrder.quantity == 0) {
+                        sellOrders.remove(j);
+                    }
+                }
+            }
+        }
+    }
+
+    public void printOrderBook() {
+        System.out.println("Order Book:");
+        System.out.println("BUY ORDERS:");
+        for (Order order : buyOrders) {
+            System.out.println("Type: " + order.type + ", Quantity: " + order.quantity + ", Price: " + order.price);
+        }
+
+        System.out.println("SELL ORDERS:");
+        for (Order order : sellOrders) {
+            System.out.println("Type: " + order.type + ", Quantity: " + order.quantity + ", Price: " + order.price);
+        }
+    }
+
+    public int getTotalBuyers() {
+        return buyOrders.size();
+    }
+
+    public int getTotalSellers() {
+        return sellOrders.size();
+    }
+
+    public int getBuyersAtPriceLevel(double price) {
+        int count = 0;
+        for (Order order : buyOrders) {
+            if (order.price == price) {
+                count++;
+            }
+        }
+        return count;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        OrderBook orderBook = new OrderBook();
+
+        // Test Case 1
+        orderBook.placeOrder(new Order("BUY", 10, 100));
+       // orderBook.printOrderBook();
+
+        // Test Case 2
+        orderBook.placeOrder(new Order("BUY", 15, 101));
+       // orderBook.printOrderBook();
+
+        // Test Case 3
+        orderBook.placeOrder(new Order("BUY", 5, 95));
+       // orderBook.printOrderBook();
+
+        // Test Case 4
+        orderBook.cancelOrder(orderBook.buyOrders.get(1));
+       // orderBook.printOrderBook();
+
+        // Test Case 5
+        orderBook.placeOrder(new Order("SELL", 20, 105));
+      // orderBook.printOrderBook();
+
+        // Test Case 6
+        orderBook.placeOrder(new Order("BUY", 25, 95));
+       orderBook.printOrderBook();
+
+        // Additional Queries
+        System.out.println("Total Buyers: " + orderBook.getTotalBuyers());
+        System.out.println("Total Sellers: " + orderBook.getTotalSellers());
+        System.out.println("Buyers at Price Level 95 INR: " + orderBook.getBuyersAtPriceLevel(95));
+    }
+}
